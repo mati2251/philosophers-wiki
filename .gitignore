@@ -1,2 +1,6 @@
 entity-model
 entity-model.dmd
+**/*.localz
+**/*.local
+**/*.git
+**/*.DS_Store
