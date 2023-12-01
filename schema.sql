@@ -12,6 +12,7 @@ CREATE TABLE Era
     AGE_TO   NUMBER                         NOT NULL
 );
 
+CREATE INDEX name_idx ON Era (NAME);
 
 INSERT INTO Era (NAME, AGE_FROM, AGE_TO)
 VALUES ('Ancient Philosophy', -700, 500);
@@ -43,6 +44,8 @@ CREATE TABLE Countries
     NAME VARCHAR2(50)                         NOT NULL
 );
 
+CREATE INDEX name_idx ON Countries (NAME);
+
 INSERT INTO Countries (NAME)
 VALUES ('Greece');
 INSERT INTO Countries (NAME)
@@ -72,6 +75,9 @@ CREATE TABLE Universities
     FOREIGN KEY (COUNTRY_ID) REFERENCES Countries (ID)
 );
 
+CREATE INDEX name_idx ON Universities (NAME);
+CREATE INDEX country_id_idx ON Universities (COUNTRY_ID);
+
 INSERT INTO Universities (NAME, COUNTRY_ID)
 Values ('Harvard University', 7);
 
@@ -97,6 +103,11 @@ CREATE TABLE Philosophers
     FOREIGN KEY (ERA_ID) REFERENCES Era (ID)
 );
 
+CREATE INDEX surname_idx ON Philosophers (SURNAME);
+CREATE INDEX era_id_idx ON Philosophers (ERA_ID);
+CREATE INDEX country_phi_id_idx ON Philosophers (COUNTRY_ID);
+CREATE INDEX alma_mutter_id_idx ON Philosophers (ALMA_MUTTER_ID);
+
 INSERT INTO Philosophers (SURNAME, NAME, DESCRIPTION, ERA_ID, ALMA_MUTTER_ID, COUNTRY_ID, YEAR_OF_BIRTH, YEAR_OF_DEATH)
 VALUES ('Aristotle', 'Aristoteles', 'Philosopher and scientist', 1, NULL, 1, -384, -322);
 
@@ -117,6 +128,9 @@ CREATE TABLE Ideas
     ERA_ID      NUMBER,
     FOREIGN KEY (ERA_ID) REFERENCES Era (ID)
 );
+
+CREATE INDEX name_ide_idx ON Ideas (NAME);
+CREATE INDEX era_id_ide_idx ON Ideas (ERA_ID);
 
 INSERT INTO Ideas (NAME, DESCRIPTION, ERA_ID)
 VALUES('Naturalism', 'Naturalism is a literary movement that emphasizes observation and the scientific method in the fictional portrayal of reality.', 1);
@@ -143,6 +157,11 @@ CREATE TABLE Groups
     FOREIGN KEY (MAIN_IDEA_ID) REFERENCES Ideas (ID)
 );
 
+CREATE INDEX name_gro_idx ON Groups (NAME);
+CREATE INDEX era_gro_id_idx ON Groups (ERA_ID);
+CREATE INDEX country_gro_id_idx ON Groups (COUNTRY_ID);
+CREATE INDEX main_idea_gro_id_idx ON Groups (MAIN_IDEA_ID);
+
 INSERT INTO Groups (NAME, DESCRIPTION, ERA_ID, COUNTRY_ID, MAIN_IDEA_ID)
 VALUES ('The Dial redaction', 'The Dial was an American magazine published intermittently from 1840 to 1929.', 5, 7, 2);
 
@@ -154,6 +173,8 @@ CREATE TABLE Philosophers_Ideas
     FOREIGN KEY (PHILOSOPHER_ID) REFERENCES Philosophers (ID),
     FOREIGN KEY (IDEA_ID) REFERENCES Ideas (ID)
 );
+
+CREATE INDEX philosopher_ideas_idx ON Philosophers_Ideas (PHILOSOPHER_ID, IDEA_ID);
 
 INSERT INTO Philosophers_Ideas (PHILOSOPHER_ID, IDEA_ID)
 VALUES (2, 1);
@@ -167,6 +188,8 @@ CREATE TABLE Philosophers_Groups
     FOREIGN KEY (PHILOSOPHER_ID) REFERENCES Philosophers (ID),
     FOREIGN KEY (GROUP_ID) REFERENCES Groups (ID)
 );
+
+CREATE INDEX philosopher_groups_idx ON Philosophers_Groups (PHILOSOPHER_ID, GROUP_ID);
 
 INSERT INTO Philosophers_Groups (PHILOSOPHER_ID, GROUP_ID)
 VALUES (2, 1);
@@ -187,6 +210,10 @@ CREATE TABLE Books
     MAIN_IDEA_ID    NUMBER,
     FOREIGN KEY (PHILOSOPHER_ID) REFERENCES Philosophers (ID)
 );
+
+CREATE INDEX title_idx ON Books (TITLE);
+CREATE INDEX philosopher_id_idx ON Books (PHILOSOPHER_ID);
+CREATE INDEX main_idea_id_idx ON Books (MAIN_IDEA_ID);
 
 INSERT INTO Books (TITLE, DESCRIPTION, PUBLISHING_YEAR, PHILOSOPHER_ID)
 VALUES ('Walden', 'Walden is a book by transcendentalist Henry David Thoreau.', 1854, 2);
@@ -209,6 +236,10 @@ CREATE TABLE Quotations
     FOREIGN KEY (AUTHOR_ID) REFERENCES Philosophers (ID)
 );
 
+CREATE INDEX content_idx ON Quotations (CONTENT);
+CREATE INDEX book_id_idx ON Quotations (BOOK_ID);
+CREATE INDEX author_id_idx ON Quotations (AUTHOR_ID);
+
 INSERT INTO Quotations (CONTENT, BOOK_ID, AUTHOR_ID)
 VALUES ("I went to the woods because I wished to live deliberately, to front only the essential facts of life, and see if I could not learn what it had to teach, and not, when I came to die, discover that I had not lived.", 1, 2);
 
@@ -225,6 +256,8 @@ CREATE TABLE Sources
     LINK   VARCHAR2(200)
 );
 
+CREATE INDEX sources_idx ON Sources (SOURCE, LINK);
+
 INSERT INTO Sources (SOURCE, LINK)
 VALUES ('Wikipedia', 'https://en.wikipedia.org/wiki/Henry_David_Thoreau');
 
@@ -234,6 +267,8 @@ CREATE TABLE Sources_Groups
     SOURCE_ID NUMBER NOT NULL,
     FOREIGN KEY (SOURCE_ID) REFERENCES Sources (ID)
 );
+
+CREATE INDEX sources_groups_idx ON Sources_Groups (ID, SOURCE_ID);
 
 INSERT INTO Sources_Groups (ID, SOURCE_ID)
 VALUES (1, 1);
@@ -251,6 +286,8 @@ CREATE TABLE Paragraph
     TITLE   VARCHAR2(100)                         NOT NULL,
     CONTENT VARCHAR2(1000)                        NOT NULL
 );
+
+CREATE INDEX paragraph_idx ON Paragraph ("ORDER" ASC, TITLE, CONTENT);
 
 INSERT INTO Paragraph ("ORDER", TITLE, CONTENT)
 VALUES (1, 'Introduction', 'Henry David Thoreau was an American philosopher, essayist, poet, and naturalist.');
@@ -275,6 +312,8 @@ CREATE TABLE Paragraphs_Philosopher
     FOREIGN KEY (PHILOSOPHER_ID) REFERENCES Philosophers (ID)
 );
 
+CREATE INDEX paragraphs_philosopher_idx ON Paragraphs_Philosopher (PARAGRAPH_ID, PHILOSOPHER_ID);
+
 INSERT INTO Paragraphs_Philosopher (PARAGRAPH_ID, PHILOSOPHER_ID)
 VALUES (1, 2);
 INSERT INTO Paragraphs_Philosopher (PARAGRAPH_ID, PHILOSOPHER_ID)
@@ -288,6 +327,8 @@ CREATE TABLE Paragraphs_Group
     FOREIGN KEY (GROUP_ID) REFERENCES Groups (ID)
 );
 
+CREATE INDEX paragraphs_group_idx ON Paragraphs_Group (PARAGRAPH_ID, GROUP_ID);
+
 INSERT INTO Paragraphs_Group (PARAGRAPH_ID, GROUP_ID)
 VALUES (5, 1);
 
@@ -300,6 +341,8 @@ CREATE TABLE Paragraphs_Idea
     FOREIGN KEY (IDEA_ID) REFERENCES Ideas (ID)
 );
 
+CREATE INDEX paragraphs_idea_idx ON Paragraphs_Idea (PARAGRAPH_ID, IDEA_ID);
+
 INSERT INTO Paragraphs_Idea (PARAGRAPH_ID, IDEA_ID)
 VALUES (4, 2);
 
@@ -311,6 +354,8 @@ CREATE TABLE Paragraphs_Book
     FOREIGN KEY (BOOK_ID) REFERENCES Books (ID)
 );
 
+CREATE INDEX paragraphs_book_idx ON Paragraphs_Book (PARAGRAPH_ID, BOOK_ID);
+
 INSERT INTO Paragraphs_Book (PARAGRAPH_ID, BOOK_ID)
 VALUES (3, 1);
 
@@ -321,6 +366,8 @@ CREATE TABLE Sources_Paragraph
     FOREIGN KEY (PARAGRAPH_ID) REFERENCES Paragraph (ID),
     FOREIGN KEY (SOURCE_ID) REFERENCES Sources (ID)
 );
+
+CREATE INDEX sources_paragraph_idx ON Sources_Paragraph (PARAGRAPH_ID, SOURCE_ID);
 
 INSERT INTO Sources_Paragraph (PARAGRAPH_ID, SOURCE_ID)
 VALUES (1, 1);
@@ -339,6 +386,8 @@ CREATE TABLE Sources_Book
     FOREIGN KEY (SOURCE_ID) REFERENCES Sources (ID)
 );
 
+CREATE INDEX sources_book_idx ON Sources_Book (BOOK_ID, SOURCE_ID);
+
 INSERT INTO Sources_Book (BOOK_ID, SOURCE_ID)
 VALUES (1, 1);
 
@@ -350,6 +399,8 @@ CREATE TABLE Sources_Philosopher
     FOREIGN KEY (SOURCE_ID) REFERENCES Sources (ID)
 );
 
+CREATE INDEX sources_philosopher_idx ON Sources_Philosopher (PHILOSOPHER_ID, SOURCE_ID);
+
 INSERT INTO Sources_Philosopher (PHILOSOPHER_ID, SOURCE_ID)
 VALUES (2, 1);
 
@@ -360,6 +411,8 @@ CREATE TABLE Sources_Group
     FOREIGN KEY (GROUP_ID) REFERENCES Groups (ID),
     FOREIGN KEY (SOURCE_ID) REFERENCES Sources (ID)
 );
+
+CREATE INDEX sources_group_idx ON Sources_Group (GROUP_ID, SOURCE_ID);
 
 INSERT INTO Sources_Group (GROUP_ID, SOURCE_ID)
 VALUES (1, 1);
@@ -384,6 +437,8 @@ CREATE TABLE Philosophers_Photos
     FOREIGN KEY (PHOTO_ID) REFERENCES Photos (ID)
 );
 
+CREATE INDEX philosophers_photo_idx ON Philosophers_Photos (PHILOSOPHER_ID, PHOTO_ID);
+
 CREATE TABLE Paragraphs_Photo
 (
     PARAGRAPH_ID NUMBER NOT NULL,
@@ -391,3 +446,5 @@ CREATE TABLE Paragraphs_Photo
     FOREIGN KEY (PARAGRAPH_ID) REFERENCES Paragraph (ID),
     FOREIGN KEY (PHOTO_ID) REFERENCES Photos (ID)
 );
+
+CREATE INDEX paragraphs_photo_idx ON Paragraphs_Photo (PARAGRAPH_ID, PHOTO_ID);
